@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define CACHE_SIZE 8   // Number of blocks in cache
+#define MEMORY_SIZE 32 // Number of memory locations
+
+typedef struct {
+    int valid;
+    int tag;
+} CacheBlock;
+
+void initializeCache(CacheBlock cache[]) {
+    for (int i = 0; i < CACHE_SIZE; i++) {
+        cache[i].valid = 0;
+        cache[i].tag = -1;
+    }
+}
+
+int accessCache(CacheBlock cache[], int address) {
+    int index = address % CACHE_SIZE;
+    int tag = address / CACHE_SIZE;
+
+    if (cache[index].valid && cache[index].tag == tag) {
+        return 1; // Cache hit
+    } else {
+        cache[index].valid = 1;
+        cache[index].tag = tag;
+        return 0; // Cache miss
+    }
+}
+
+int main() {
+    CacheBlock cache[CACHE_SIZE];
+    initializeCache(cache);
+    
+    int addresses[] = {0, 4, 8, 12, 16, 20, 24, 28, 0, 4, 8, 15, 23, 7};
+    int numAccesses = sizeof(addresses) / sizeof(addresses[0]);
+    int hits = 0, misses = 0;
+    
+    for (int i = 0; i < numAccesses; i++) {
+        int result = accessCache(cache, addresses[i]);
+        if (result) {
+            hits++;
+            printf("Address %d: HIT\n", addresses[i]);
+        } else {
+            misses++;
+            printf("Address %d: MISS\n", addresses[i]);
+        }
+    }
+    
+    printf("Total Hits: %d, Total Misses: %d\n", hits, misses);
+    return 0;
+}
